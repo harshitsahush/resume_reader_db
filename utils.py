@@ -3,29 +3,36 @@ from groq import Groq
 from docx import Document
 import json
 from pydantic import BaseModel
+from sqlalchemy.sql import text
+import streamlit as st
+import uuid
+import sqlite3
 
-class Education(BaseModel):
-    degree : str
-    university : str
-    grad_date : str
+# class Education(BaseModel):
+#     degree : str
+#     university : str
+#     grad_date : str
 
-class Experience(BaseModel):
-    job_title: str
-    company : str
-    duration : str
-    responsibilities : list[str]
+# class Experience(BaseModel):
+#     job_title: str
+#     company : str
+#     duration : str
+#     responsibilities : list[str]
 
 class Response(BaseModel):
     name : str
     email : str
     contact : str
     skills : list[str]
-    education : list[Education]
-    experiences : list[Experience]
+    total_experience_duration : str
+    # education : list[Education]
+    # experiences : list[Experience]
 
 def get_pdf_text(pdfs):
     text = ""
+    print(type(pdfs))
     for pdf in pdfs:
+        print(type(pdf))
         reader = PdfReader(pdf)
         for page in reader.pages:
             text += page.extract_text() + "/n"
@@ -54,9 +61,25 @@ def query_response(text):
             }
         ],
         model = "llama3-70b-8192",
-
+        temperature=0.1,
         response_format={"type" : "json_object"}
     )
 
     return chat_completion.choices[0].message.content
 
+def save_in_db(response, unique_id, cursor, conn):
+    print(response)
+    cursor.execute(
+        "INSERT INTO resume_data (uid, Name, E_mail, Contact, Skills, Experience) VALUES (?,?,?,?,?,?)",
+        (unique_id, response['name'], response['email'], response['contact'], ", ".join(response['skills']) , response["total_experience_duration"])
+    )
+    conn.commit()
+
+def get_from_db(unique_id, cursor, conn):
+    print(unique_id)
+    with conn:
+        cursor.execute(
+            "SELECT * FROM resume_data WHERE uid = (?)", 
+            ((unique_id,))
+        )
+        return cursor.fetchall()
