@@ -79,7 +79,7 @@ def get_from_db(unique_id, cursor, conn):
     print(unique_id)
     with conn:
         cursor.execute(
-            "SELECT * FROM resume_data WHERE uid = (?)", 
+            "SELECT Name,E_mail,Contact,Skills,Experience FROM resume_data WHERE uid = (?)", 
             ((unique_id,))
         )
         return cursor.fetchall()
