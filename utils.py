@@ -74,7 +74,6 @@ def query_response(text):
     return chat_completion.choices[0].message.content
 
 def save_in_db(response, unique_id, cursor, conn):
-    print(response)
     cursor.execute(
         "INSERT INTO resume_data (uid, Name, E_mail, Contact, Skills, Experience) VALUES (?,?,?,?,?,?)",
         (unique_id, response['name'], response['email'], response['contact'], response['skills'] , response["total_experience_duration"])
@@ -82,7 +81,6 @@ def save_in_db(response, unique_id, cursor, conn):
     conn.commit()
 
 def get_from_db(unique_id, cursor, conn):
-    print(unique_id)
     with conn:
         cursor.execute(
             "SELECT Name,E_mail,Contact,Skills,Experience FROM resume_data WHERE uid = (?)", 

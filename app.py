@@ -33,7 +33,6 @@ if(submit):
 
         response = query_response(text)
         response_dict = json.loads(response)
-        print(st.session_state["uid"])
 
         save_in_db(response_dict, st.session_state['uid'], cursor, conn)
         st.success("Entry saved!")
