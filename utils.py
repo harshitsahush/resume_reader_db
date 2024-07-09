@@ -48,12 +48,18 @@ def get_docx_text(docx_files):
 
 def query_response(text):
     client = Groq(api_key="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")
+    template = { "name" : '',
+                 "email" : '',
+                 "contact" : '',
+                 "skills" : '', 
+                 "total_experience_duration" : ''
+    }
+
     chat_completion = client.chat.completions.create(
         messages = [
             {
                 "role" : "system",
-                "content" : """You are a resume extractor API that responds in JSON. The provided text is a resume and the response must use the schema \n """ +
-                json.dumps(Response.model_json_schema(), indent = 2)
+                "content" : ''' Extract the candidate information data from this Content. Don't comment inside json. Only extract information from this context.Don't generate extra information: . make sure to give only key skills not everything. Give answer in json format. Template Output Example :'''+ json.dumps(template) + '''\n Don't give extra details in template.'''
             },
             {
                 "role" : "user",
@@ -71,7 +77,7 @@ def save_in_db(response, unique_id, cursor, conn):
     print(response)
     cursor.execute(
         "INSERT INTO resume_data (uid, Name, E_mail, Contact, Skills, Experience) VALUES (?,?,?,?,?,?)",
-        (unique_id, response['name'], response['email'], response['contact'], ", ".join(response['skills']) , response["total_experience_duration"])
+        (unique_id, response['name'], response['email'], response['contact'], response['skills'] , response["total_experience_duration"])
     )
     conn.commit()
 
