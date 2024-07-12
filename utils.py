@@ -83,7 +83,7 @@ def save_in_db(response, unique_id, cursor, conn):
 def get_from_db(unique_id, cursor, conn):
     with conn:
         cursor.execute(
-            "SELECT Name,E_mail,Contact,Skills,Experience FROM resume_data WHERE uid = (?)", 
-            ((unique_id,))
+            "SELECT Name,E_mail,Contact,Skills,Experience FROM resume_data WHERE uid = ?", 
+            (unique_id,)
         )
         return cursor.fetchall()
